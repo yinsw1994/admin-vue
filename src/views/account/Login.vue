@@ -12,20 +12,29 @@
         </li>
       </ul>
 
-      <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item>
+      <el-form
+        ref="formRef"
+        :model="form"
+        label-width="80px"
+        :rules="form_rules"
+      >
+        <el-form-item prop="username">
           <label class="form-label">用户名</label>
-          <el-input></el-input>
+          <el-input v-model="username"></el-input>
         </el-form-item>
         <el-form-item>
           <label class="form-label">密码</label>
-          <el-input type="password"></el-input>
+          <el-input type="password" v-model="password"></el-input>
+        </el-form-item>
+        <el-form-item v-if="current_menu == 'register'">
+          <label class="form-label">确认密码</label>
+          <el-input type="passwords" v-model="passwords"></el-input>
         </el-form-item>
         <el-form-item>
           <label class="form-label">验证码</label>
           <el-row :gutter="10">
             <el-col :span="14">
-              <el-input type="password"></el-input>
+              <el-input v-model="code"></el-input>
             </el-col>
             <el-col :span="10">
               <el-button type="success" class="el-button-block"
@@ -45,7 +54,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, onMounted } from "vue";
+import { reactive, toRefs, ref, onMounted, watch } from "vue";
 
 export default {
   setup() {
@@ -54,6 +63,24 @@ export default {
         { type: "login", label: "登录" },
         { type: "register", label: "注册" },
       ],
+      form_rules: {
+        username: [
+          { required: true, message: "用户名必填", trigger: "change" },
+          {
+            min: 3,
+            max: 5,
+            message: "长度在 3 到 5 个字符",
+            trigger: "change",
+          },
+        ],
+      },
+    });
+
+    const form = reactive({
+      username: "",
+      password: "",
+      passwords: "",
+      code: "",
     });
 
     let current_menu = ref(data.tab_menu[0].type);
@@ -67,18 +94,28 @@ export default {
       current_menu.value = type;
     };
 
-    const form = ref(null);
+    const formRef = ref(null);
 
     onMounted(() => {
-      console.log(`output->"form的值"`, "form的值", form.value);
+      console.log(`output->"form的值"`, "form的值", form);
+    });
+
+    watch(form, (oldnew, prev) => {
+      console.log(`output->oldnew`, oldnew, prev, form);
+    });
+
+    watch(current_menu, (neww, prev) => {
+      console.log(`output->old, new`, prev, neww);
     });
 
     return {
       ...toRefs(data),
-      form,
+      formRef,
       submit,
       current_menu,
       toggleMenu,
+      ...toRefs(form),
+      form,
     };
   },
 };
