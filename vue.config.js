@@ -7,6 +7,10 @@ const { defineConfig } = require("@vue/cli-service")
 // const Components = require("unplugin-vue-components/webpack")
 // const { ElementPlusResolver } = require("unplugin-vue-components/resolvers")
 
+function resolve(dir) {
+    return path.join(__dirname, dir)
+}
+
 
 module.exports = {
     // 基本路径
@@ -18,7 +22,14 @@ module.exports = {
     /** vue3.0内置了webpack所有东西，
      * webpack配置,see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
      **/
-    chainWebpack: (config) => { },
+    // chainWebpack: (config) => { },
+    chainWebpack: config => {
+        config
+            .resolve.alias
+            .set('@', resolve('src'))    //配置src目录别名
+            .set('assets', resolve('src/assets'))    //配置src/assets目录别名
+            .set('components', resolve('src/components'));    //配置src/components目录别名
+    },
     configureWebpack: (config) => {
         plugins: [
             // AutoImport({
@@ -53,7 +64,22 @@ module.exports = {
      */
     pwa: {},
     // webpack-dev-server 相关配置
-    devServer: {},
+    devServer: {
+        open: false,
+        host: "0.0.0.0",
+        port: 8080,
+        proxy: {
+            [process.env.VUE_APP_API]: {
+                target: process.env.VUE_API_DEV_TARGET,
+                changeOrigin: true,
+                ws: false,
+                secure: false,
+                pathRewrite: {
+                    [`^${process.env.VUE_APP_API}`]: ""
+                }
+            }
+        }
+    },
     /**
      * 第三方插件配置
      */
