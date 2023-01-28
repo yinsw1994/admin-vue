@@ -27,9 +27,9 @@ service.interceptors.response.use(function (response) {
     } else {
         ElMessage({
             type: 'error',
-            message: response.message
+            message: response.data.message
         })
-        return Promise.reject(response)
+        return Promise.reject(response.data)
     }
 }, function (error) {
     console.log(`output->error.request`, error.request)

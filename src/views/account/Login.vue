@@ -84,6 +84,7 @@ import {
 } from "../../utils/validate";
 
 export default {
+  name: "Login_register_page",
   setup() {
     let { proxy } = getCurrentInstance();
 
@@ -209,9 +210,7 @@ export default {
     };
 
     const reset = () => {
-      Object.keys(form).forEach((it) => {
-        form[it] = "";
-      });
+      proxy.$refs.formRef.resetFields();
       data.submit_button_disabled = true;
       code_button_disabled.value = false;
       count_sixty.value = 0;
@@ -267,7 +266,8 @@ export default {
         module: "register",
       })
         .then((response) => {
-          const data1 = response.data;
+          const data1 = response;
+          console.log("🚀 ~ file: Login.vue:270 ~ .then ~ data1", data1);
           if (data1.resCode == 1024) {
             proxy.$message.error(data1.message);
             return;
@@ -292,7 +292,9 @@ export default {
           }
           countDown();
         })
-        .catch(() => {})
+        .catch(() => {
+          code_button_txt.value = "获取验证码";
+        })
         .finally(() => {
           code_button_disabled.value = false;
         });
